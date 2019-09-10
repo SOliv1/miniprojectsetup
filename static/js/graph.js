@@ -6,6 +6,10 @@ queue()
 function makeGraphs(error, salaryData) {
     var ndx = crossfilter(salaryData);
     
+    salaryData.forEach(function(d){
+        d.salary = parseInt(d.salary);
+    })
+    
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
     show_average_salary(ndx);
@@ -13,7 +17,7 @@ function makeGraphs(error, salaryData) {
     dc.renderAll();
 }
 
-function show_discipline_selector(ndx) {
+function show_discipline_selector(ndx)  { 
     var dim = ndx.dimension(dc.pluck('discipline'));
     var group = dim.group();
     
@@ -21,6 +25,7 @@ function show_discipline_selector(ndx) {
         .dimension(dim)
         .group(group);
 }
+
 
 function show_gender_balance(ndx) {
     var dim = ndx.dimension(dc.pluck('sex'));
@@ -39,6 +44,7 @@ function show_gender_balance(ndx) {
         .yAxis().ticks(20);
 }
 
+
 function show_average_salary(ndx) {
     var dim = ndx.dimension(dc.pluck('sex'));
     
@@ -47,7 +53,10 @@ function show_average_salary(ndx) {
         p.total += v.salary;
         p.average = p.total / p.count;
         return p;
+
     }
+
+
 
     function remove_item(p, v) {
         p.count--;
@@ -62,14 +71,26 @@ function show_average_salary(ndx) {
     }
     
     function initialise() {
-
         return {count: 0, total: 0, average: 0};
     }
 
     var averageSalaryByGender = dim.group().reduce(add_item, remove_item, initialise);
 
-console.log(averageSalaryByGender)
+    dc.barChart("#average-salary")
+        .width(400)
+        .height(300)
+        .margins({top: 10, right: 50, bottom: 30, left: 50})
+        .dimension(dim)
+        .group(averageSalaryByGender)
+        .valueAccessor(function(d){
+            return d.value.average.toFixed(2);
+        })
+        .transitionDuration(500)
+        .x(d3.scale.ordinal())
+        .xUnits(dc.units.ordinal)
+        .elasticY(true)
+        .xAxisLabel("Gender")
+        .yAxis().ticks(4);   
 
-    
 }
 
