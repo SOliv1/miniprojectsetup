@@ -1,3 +1,4 @@
+
 queue()
     .defer(d3.csv, "data/Salaries.csv")
     .await(makeGraphs);
@@ -8,9 +9,10 @@ function makeGraphs(error, salaryData) {
     show_discipline_selector(ndx);
     show_gender_balance(ndx);
     show_average_salaries(ndx);
-
+    
     dc.renderAll();
 }
+
 function show_discipline_selector(ndx) {
     var dim = ndx.dimension(dc.pluck('discipline'));
     var group = dim.group();
@@ -46,6 +48,7 @@ function show_average_salaries(ndx) {
         p.average = p.total;
         return p;
     }
+
     function remove_item(p, v) {
         p.count--;
         if (p.count == 0) {
@@ -54,19 +57,16 @@ function show_average_salaries(ndx) {
         } else {
             p.total -= v.salary;
             p.average = p.total / p.count;
-
         }
         return p;
-
     }
 
     function initialise () {
-
         return {count: 0, total: 0, average: 0};
-
     }
-
     var averageSalaryByGender = dim.group().reduce(add_item, remove_item, initialise);
 }
+
+
 
 
