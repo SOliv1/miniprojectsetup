@@ -56,8 +56,6 @@ function show_average_salary(ndx) {
 
     }
 
-
-
     function remove_item(p, v) {
         p.count--;
         if(p.count == 0) {
@@ -91,6 +89,59 @@ function show_average_salary(ndx) {
         .elasticY(true)
         .xAxisLabel("Gender")
         .yAxis().ticks(4);   
+}
+        function show_rank_distribution(ndx) {
+    var  dim = ndx.dimension(dc.pluck('sex'));
+
+    var profByGender = dim.group().reduce(
+        function (p, v) {
+            p.total++;
+            if(v.rank == rank) {
+                p.match++;
+            }
+            return p;
+        },
+        function (p, v) {
+            p.total--;
+            if(v.rank == rank) {
+                p.match--;
+            }
+            return p;
+        },
+        function () {
+               return {total: 0, match: 0};
+        }
+    );
+    function rankByGender (dimension, rank) {
+        return dimension.group().reduce(
+            function (p, v) {
+                p.total++;
+                if(v.rank == rank) {
+                    p.match++;
+                }
+                return p;
+            },
+            function (p, v) {
+                p.total--;
+                if(v.rank == rank) {
+                    p.match--;
+                }
+                return p;
+            },
+            function () {
+                return {total: 0, match: 0};
+            }
+            
+        );
+    }
+    
+    var profByGender = rankByGender(dim, "Prof");
+    var asstProfByGender = rankByGender(dim, "AsstProf");
+    var assocProfByGender = rankByGender(dim, "AssocProf");
+    
+    console.log(profByGender.all());
 
 }
+
+
 
